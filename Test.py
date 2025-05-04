@@ -5,13 +5,13 @@ import os
 from PIL import Image
 
 # Define Path to model and classes
-PATH = 'model/model_20250430_154030_18'
-classes = {0: 'Glioma', 1: 'Meningioma', 2: 'No Tumor', 3: 'Pituitary'}
-class_names = ['Glioma', 'Meningioma','No Tumor','Pituitary']  # Names of classes in order of index
+PATH = 'model/model_20250502_143146_26'
+classes = {0: 'glioma', 1: 'meningioma', 2: 'notumor', 3: 'pituitary'}
+class_names = ['glioma', 'meningioma','notumor','pituitary']  # Names of classes in order of index
 
 # Define transformation for from scratch
 transform = transforms.Compose([
-        transforms.RandomResizedCrop(300, scale=(0.8, 1.0)),
+        transforms.Resize((224,224)),
         transforms.ToTensor(),
         transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
     ])
@@ -19,7 +19,8 @@ transform = transforms.Compose([
 # Load the model
 net = Net()
 net.load_state_dict(torch.load(PATH))
-device = torch.device('cpu')
+device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+print(device)
 net.to(device)
 net.eval()  # Set the model to evaluation mode
 
@@ -47,7 +48,7 @@ def test_single_image(image_path):
         correct += 1
 
 # Iterate over the entire test folder
-test_dir = 'Test/Testing'
+test_dir = 'archive/data'
 for root, dirs, files in os.walk(test_dir):
     for file in files:
         if file.lower().endswith(('.png', '.jpg', '.jpeg')):    # Filter for images
